@@ -51,7 +51,7 @@ jobs:
       - name: create release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}  # That's how the runner authenticates with GitHub API to create the release
+          GITHUB_TOKEN: ${{ secrets.github_token }}  # That's how the runner authenticates with GitHub api to create the release
         with:
           tag_name: ${{ github.run_number }}
           release_name: Release from ${{ github.run_number }}
