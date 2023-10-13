@@ -40,15 +40,17 @@ jobs:
             cd function
             zip -r ../${{ github.sha }}.zip .
       - name: Archive artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v2  # Community action to upload artifact
         with:
           name: zipped-bundle
           path: ${{ github.sha }}.zip
   
   publish:
     runs-on: ubuntu-latest
+    need: build # Here we specify that the current job depends on the build job
     steps:
       - name: create release
+        id: create-release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}  # That's how the runner authenticates with GitHub api to create the release
@@ -58,4 +60,29 @@ jobs:
           body: New release for ${{ github.sha }}. Release notes on the documentation site
           draft: false
           prerelease: false
+      # pull down the artifact that was created in the build job    
+      - name: download artifact
+        uses: actions/download-artifact@v2 # Community action to download artifact
+        with:
+          name: zipped-bundle # the same name as above (line 45) to reference the artifact
+      # upload the artifact as an asset for this release     
+      - name: upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
+        with:
+          # The endpoint of the specific release where it can put the artifact. 
+          # Since this is going to change from release to release we are going to 
+          # need to generate it in each Workflow execution. Fortunately, this URL is an
+          # output of the create release step that we already have running. We can refer to this 
+          # previous step using an id. In GitHub actions, IDs are unique identifies for steps.     
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          # asset_path specifies where in the runner the asset is now
+          asset_path: ./${{ github.sha }}.zip
+          # the name that is going to appear on the release page
+          asset_name: source_code_with_libraries.zip
+          asset_content_type: application/zip
+
+  
+
 
