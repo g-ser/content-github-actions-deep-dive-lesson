@@ -47,7 +47,7 @@ jobs:
   
   publish:
     runs-on: ubuntu-latest
-    need: build # Here we specify that the current job depends on the build job
+    needs: build # Here we specify that the current job depends on the build job
     steps:
       - name: create release
         id: create-release
