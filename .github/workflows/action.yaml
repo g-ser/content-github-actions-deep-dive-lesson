@@ -75,7 +75,7 @@ jobs:
     needs: upload
     strategy:
       matrix:
-        inputs: ["Hello", "Hi"]  
+        input: ["Hello", "Hi"]  
     steps:  
       - name: Configure AWS credentials  
         uses: aws-actions/configure-aws-credentials@v1  
